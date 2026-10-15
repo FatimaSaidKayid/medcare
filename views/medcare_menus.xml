@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_medcare_root" name="MedCare" sequence="5" web_icon="medcare,static/description/icon.png"
+              groups="group_medcare_receptionist,group_medcare_doctor,group_medcare_patient,group_medcare_admin"/>
+
+    <menuitem id="menu_medcare_patients" name="Patients" parent="menu_medcare_root"
+              action="action_medcare_patient" sequence="10"
+              groups="group_medcare_doctor,group_medcare_admin"/>
+
+    <menuitem id="menu_medcare_doctors" name="Doctors" parent="menu_medcare_root"
+              action="action_medcare_doctor" sequence="20"
+              groups="group_medcare_doctor,group_medcare_admin"/>
+
+    <menuitem id="menu_medcare_departments" name="Departments" parent="menu_medcare_root"
+              action="action_medcare_department" sequence="25"
+              groups="group_medcare_doctor,group_medcare_admin"/>
+
+    <menuitem id="menu_medcare_appointments" name="Appointments" parent="menu_medcare_root"
+              action="action_medcare_appointment" sequence="30"
+              groups="group_medcare_receptionist,group_medcare_doctor,group_medcare_admin"/>
+
+    <menuitem id="menu_medcare_prescriptions" name="Prescriptions" parent="menu_medcare_root"
+              action="action_medcare_prescription" sequence="40"
+              groups="group_medcare_doctor,group_medcare_patient,group_medcare_admin"/>
+
+</odoo>

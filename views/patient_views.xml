@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_medcare_patient_tree" model="ir.ui.view">
+        <field name="name">medcare.patient.tree</field>
+        <field name="model">medcare.patient</field>
+        <field name="arch" type="xml">
+            <tree string="Patients" decoration-muted="status=='inactive'">
+                <field name="patient_ref"/>
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="gender"/>
+                <field name="age"/>
+                <field name="last_visit_date"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='active'"
+                       decoration-danger="status=='inactive'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_medcare_patient_form" model="ir.ui.view">
+        <field name="name">medcare.patient.form</field>
+        <field name="model">medcare.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="active,inactive"/>
+                </header>
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_appointments" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field name="appointment_count" widget="statinfo" string="Appointments"/>
+                        </button>
+                        <button name="action_view_prescriptions" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                groups="medcare.group_medcare_doctor,medcare.group_medcare_patient">
+                            <field name="prescription_count" widget="statinfo" string="Prescriptions"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Patient Full Name"/></h1>
+                        <field name="patient_ref" readonly="1"/>
+                    </div>
+                    <notebook>
+                        <page string="Personal Information">
+                            <group>
+                                <group string="Basic Information">
+                                    <field name="phone"/>
+                                    <field name="email"/>
+                                    <field name="gender"/>
+                                    <field name="date_of_birth"/>
+                                    <field name="age" readonly="1"/>
+                                    <field name="blood_type"/>
+                                    <field name="user_id" groups="medcare.group_medcare_admin"/>
+                                </group>
+                                <group string="Address Information">
+                                    <field name="street"/>
+                                    <field name="city"/>
+                                    <field name="country_id"/>
+                                    <field name="postal_code"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Medical History">
+                            <group>
+                                <field name="blood_type"/>
+                                <field name="allergies"/>
+                                <field name="chronic_diseases"/>
+                            </group>
+                        </page>
+                        <page string="Prescriptions" name="prescriptions"
+                              groups="medcare.group_medcare_doctor,medcare.group_medcare_patient">
+                            <field name="prescription_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="doctor_id"/>
+                                    <field name="appointment_id"/>
+                                    <field name="diagnosis"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Any additional information..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_medcare_patient_search" model="ir.ui.view">
+        <field name="name">medcare.patient.search</field>
+        <field name="model">medcare.patient</field>
+        <field name="arch" type="xml">
+            <search string="Search Patients">
+                <field name="name"/>
+                <field name="patient_ref"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <filter string="Male" name="male" domain="[('gender','=','male')]"/>
+                <filter string="Female" name="female" domain="[('gender','=','female')]"/>
+                <filter string="Active" name="active" domain="[('status','=','active')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Gender" name="group_gender" context="{'group_by':'gender'}"/>
+                    <filter string="Blood Type" name="group_blood" context="{'group_by':'blood_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by':'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_medcare_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">medcare.patient</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_medcare_patient_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first patient</p>
+        </field>
+    </record>
+
+</odoo>

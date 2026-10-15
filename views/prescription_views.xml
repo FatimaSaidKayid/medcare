@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_medcare_prescription_tree" model="ir.ui.view">
+        <field name="name">medcare.prescription.tree</field>
+        <field name="model">medcare.prescription</field>
+        <field name="arch" type="xml">
+            <tree string="Prescriptions">
+                <field name="name"/>
+                <field name="prescription_date"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="appointment_id"/>
+                <field name="diagnosis"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_medcare_prescription_form" model="ir.ui.view">
+        <field name="name">medcare.prescription.form</field>
+        <field name="model">medcare.prescription</field>
+        <field name="arch" type="xml">
+            <form string="Prescription">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="appointment_id"
+                                   domain="[('patient_id', '=?', patient_id), ('doctor_id', '=?', doctor_id)]"/>
+                            <field name="patient_id" readonly="appointment_id"/>
+                            <field name="doctor_id" readonly="appointment_id"/>
+                        </group>
+                        <group>
+                            <field name="prescription_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="diagnosis" placeholder="Diagnosis..."/>
+                    </group>
+                    <notebook>
+                        <page string="Medicines" name="medicines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="medicine"/>
+                                    <field name="dosage"/>
+                                    <field name="frequency"/>
+                                    <field name="duration"/>
+                                    <field name="instructions"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes / Advice" name="notes">
+                            <field name="notes" placeholder="Advice for the patient..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_medcare_prescription_search" model="ir.ui.view">
+        <field name="name">medcare.prescription.search</field>
+        <field name="model">medcare.prescription</field>
+        <field name="arch" type="xml">
+            <search string="Search Prescriptions">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="diagnosis"/>
+                <filter string="Today" name="today"
+                        domain="[('prescription_date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Doctor" name="group_doctor" context="{'group_by':'doctor_id'}"/>
+                    <filter string="Patient" name="group_patient" context="{'group_by':'patient_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by':'prescription_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_medcare_prescription" model="ir.actions.act_window">
+        <field name="name">Prescriptions</field>
+        <field name="res_model">medcare.prescription</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_medcare_prescription_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Write your first prescription</p>
+        </field>
+    </record>
+
+</odoo>

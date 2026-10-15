@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_medcare_appointment" model="ir.actions.report">
+        <field name="name">Print Invoice</field>
+        <field name="model">medcare.appointment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">medcare.report_medcare_appointment_document</field>
+        <field name="report_file">medcare.report_medcare_appointment_document</field>
+        <field name="print_report_name">'Appointment - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_medcare_appointment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_medcare_appointment_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: Arial, Helvetica, sans-serif;">
+
+                    <!-- Header -->
+                    <div class="row" style="border-bottom: 3px solid #4285F4; padding-bottom: 12px; margin-bottom: 20px;">
+                        <div class="col-6">
+                            <h2 style="color:#4285F4; margin-bottom:0;">
+                                <i class="fa fa-heartbeat" style="color:#4285F4;"/> MedCare
+                            </h2>
+                            <span class="text-muted">Clinic Management System</span>
+                        </div>
+                        <div class="col-6 text-right">
+                            <h3 style="margin-bottom:0;">APPOINTMENT</h3>
+                            <span>Ref.: <strong t-field="o.name"/></span><br/>
+                            <span>Date: <span t-field="o.appointment_date"/></span>
+                        </div>
+                    </div>
+
+                    <!-- Patient &amp; Doctor Info -->
+                    <div class="row mb-4">
+                        <div class="col-6" style="border-right:1px solid #eee;">
+                            <h5 style="color:#4285F4;">Patient Information</h5>
+                            <table style="width:100%;">
+                                <tr><td style="width:35%;"><strong>Name:</strong></td>
+                                    <td><span t-field="o.patient_id.name"/></td></tr>
+                                <tr><td><strong>Patient ID:</strong></td>
+                                    <td><span t-field="o.patient_id.patient_ref"/></td></tr>
+                                <tr><td><strong>Phone:</strong></td>
+                                    <td><span t-field="o.patient_id.phone"/></td></tr>
+                                <tr><td><strong>Email:</strong></td>
+                                    <td><span t-field="o.patient_id.email"/></td></tr>
+                                <tr><td><strong>Age:</strong></td>
+                                    <td><span t-field="o.patient_id.age"/></td></tr>
+                                <tr><td><strong>Gender:</strong></td>
+                                    <td><span t-field="o.patient_id.gender"/></td></tr>
+                                <tr><td><strong>Blood Type:</strong></td>
+                                    <td><span t-field="o.patient_id.blood_type"/></td></tr>
+                            </table>
+                        </div>
+                        <div class="col-6" style="padding-left: 20px;">
+                            <h5 style="color:#4285F4;">Doctor Information</h5>
+                            <table style="width:100%;">
+                                <tr><td style="width:35%;"><strong>Name:</strong></td>
+                                    <td>Dr. <span t-field="o.doctor_id.name"/></td></tr>
+                                <tr><td><strong>Specialty:</strong></td>
+                                    <td><span t-field="o.doctor_id.specialty"/></td></tr>
+                                <tr><td><strong>Phone:</strong></td>
+                                    <td><span t-field="o.doctor_id.phone"/></td></tr>
+                                <tr><td><strong>Department:</strong></td>
+                                    <td><span t-field="o.doctor_id.department"/></td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Appointment details -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 style="color:#4285F4;">Appointment Details</h5>
+                            <table class="table table-bordered" style="margin-top:6px;">
+                                <tr>
+                                    <td style="width:20%;"><strong>Date</strong></td>
+                                    <td style="width:30%;"><span t-field="o.appointment_date"/></td>
+                                    <td style="width:20%;"><strong>Time</strong></td>
+                                    <td style="width:30%;"><span t-field="o.appointment_time" t-options="{'widget': 'float_time'}"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Type</strong></td>
+                                    <td><span t-field="o.appointment_type"/></td>
+                                    <td><strong>Duration</strong></td>
+                                    <td><span t-field="o.duration"/> min</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Location</strong></td>
+                                    <td><span t-field="o.location"/></td>
+                                    <td><strong>Status</strong></td>
+                                    <td><span t-field="o.status"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reason</strong></td>
+                                    <td colspan="3"><span t-field="o.reason"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div t-if="o.notes" class="mt-4">
+                        <h5>Notes</h5>
+                        <p><span t-field="o.notes"/></p>
+                    </div>
+
+                    <div class="mt-4 text-center text-muted">
+                        <p>Thank you for choosing MedCare!</p>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

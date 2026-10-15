@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_medcare_prescription" model="ir.actions.report">
+        <field name="name">Print Prescription</field>
+        <field name="model">medcare.prescription</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">medcare.report_medcare_prescription_document</field>
+        <field name="report_file">medcare.report_medcare_prescription_document</field>
+        <field name="print_report_name">'Prescription - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_medcare_prescription"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_medcare_prescription_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: Arial, Helvetica, sans-serif;">
+
+                    <div class="row" style="border-bottom: 3px solid #4285F4; padding-bottom: 12px; margin-bottom: 20px;">
+                        <div class="col-6">
+                            <h2 style="color:#4285F4; margin-bottom:0;">MedCare</h2>
+                            <span class="text-muted">Clinic Management System</span>
+                        </div>
+                        <div class="col-6 text-right">
+                            <h3 style="margin-bottom:0;">PRESCRIPTION</h3>
+                            <span>Ref.: <strong t-field="o.name"/></span><br/>
+                            <span>Date: <span t-field="o.prescription_date"/></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-6" style="border-right:1px solid #eee;">
+                            <h5 style="color:#4285F4;">Patient</h5>
+                            <table style="width:100%;">
+                                <tr><td style="width:35%;"><strong>Name:</strong></td>
+                                    <td><span t-field="o.patient_id.name"/></td></tr>
+                                <tr><td><strong>Patient ID:</strong></td>
+                                    <td><span t-field="o.patient_id.patient_ref"/></td></tr>
+                                <tr><td><strong>Age:</strong></td>
+                                    <td><span t-field="o.patient_id.age"/></td></tr>
+                                <tr><td><strong>Gender:</strong></td>
+                                    <td><span t-field="o.patient_id.gender"/></td></tr>
+                                <tr t-if="o.patient_id.allergies"><td><strong>Allergies:</strong></td>
+                                    <td><span t-field="o.patient_id.allergies"/></td></tr>
+                            </table>
+                        </div>
+                        <div class="col-6" style="padding-left: 20px;">
+                            <h5 style="color:#4285F4;">Doctor</h5>
+                            <table style="width:100%;">
+                                <tr><td style="width:35%;"><strong>Name:</strong></td>
+                                    <td><span t-esc="o.doctor_id.display_name"/></td></tr>
+                                <tr><td><strong>Specialty:</strong></td>
+                                    <td><span t-field="o.doctor_id.specialty"/></td></tr>
+                                <tr><td><strong>Department:</strong></td>
+                                    <td><span t-field="o.doctor_id.department_id"/></td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div t-if="o.diagnosis" class="mb-3">
+                        <h5 style="color:#4285F4;">Diagnosis</h5>
+                        <p><span t-field="o.diagnosis"/></p>
+                    </div>
+
+                    <h5 style="color:#4285F4;">Rx</h5>
+                    <table class="table table-bordered" style="margin-top:6px;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Medicine</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th>Instructions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.line_ids" t-as="line">
+                                <tr>
+                                    <td><span t-esc="line_index + 1"/></td>
+                                    <td><strong t-field="line.medicine"/></td>
+                                    <td><span t-field="line.dosage"/></td>
+                                    <td><span t-field="line.frequency"/></td>
+                                    <td><span t-field="line.duration"/></td>
+                                    <td><span t-field="line.instructions"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div t-if="o.notes" class="mt-4">
+                        <h5>Notes / Advice</h5>
+                        <p><span t-field="o.notes"/></p>
+                    </div>
+
+                    <div class="mt-5 text-right">
+                        <p>Doctor's signature: ______________________</p>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

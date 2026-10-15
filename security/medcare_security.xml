@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_medcare" model="ir.module.category">
+            <field name="name">MedCare</field>
+            <field name="description">MedCare Clinic Management System</field>
+            <field name="sequence">20</field>
+        </record>
+        
+        <record id="group_medcare_receptionist" model="res.groups">
+            <field name="name">Receptionist</field>
+            <field name="category_id" ref="module_category_medcare"/>
+        </record>
+
+        <record id="group_medcare_doctor" model="res.groups">
+            <field name="name">Doctor</field>
+            <field name="category_id" ref="module_category_medcare"/>
+        </record>
+
+        <!-- A patient who logs in: sees only his own prescriptions -->
+        <record id="group_medcare_patient" model="res.groups">
+            <field name="name">Patient</field>
+            <field name="category_id" ref="module_category_medcare"/>
+        </record>
+
+        <record id="group_medcare_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_medcare"/>
+            <field name="implied_ids" eval="[(4, ref('group_medcare_doctor')),
+                                              (4, ref('group_medcare_receptionist'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+
+        <!-- Patients -->
+        <record id="rule_medcare_patient_doctor" model="ir.rule">
+            <field name="name">Patient: doctor sees only his own patients</field>
+            <field name="model_id" ref="model_medcare_patient"/>
+            <field name="groups" eval="[(4, ref('group_medcare_doctor'))]"/>
+            <field name="domain_force">[('appointment_ids.doctor_id.user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_patient_all" model="ir.rule">
+            <field name="name">Patient: receptionist / admin see all</field>
+            <field name="model_id" ref="model_medcare_patient"/>
+            <field name="groups" eval="[(4, ref('group_medcare_receptionist')), (4, ref('group_medcare_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Appointments -->
+        <record id="rule_medcare_appointment_doctor" model="ir.rule">
+            <field name="name">Appointment: doctor sees only his own appointments</field>
+            <field name="model_id" ref="model_medcare_appointment"/>
+            <field name="groups" eval="[(4, ref('group_medcare_doctor'))]"/>
+            <field name="domain_force">[('doctor_id.user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_appointment_all" model="ir.rule">
+            <field name="name">Appointment: receptionist / admin see all</field>
+            <field name="model_id" ref="model_medcare_appointment"/>
+            <field name="groups" eval="[(4, ref('group_medcare_receptionist')), (4, ref('group_medcare_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Prescriptions -->
+        <record id="rule_medcare_prescription_doctor" model="ir.rule">
+            <field name="name">Prescription: doctor sees only his own prescriptions</field>
+            <field name="model_id" ref="model_medcare_prescription"/>
+            <field name="groups" eval="[(4, ref('group_medcare_doctor'))]"/>
+            <field name="domain_force">[('doctor_id.user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_prescription_all" model="ir.rule">
+            <field name="name">Prescription: admin sees all</field>
+            <field name="model_id" ref="model_medcare_prescription"/>
+            <field name="groups" eval="[(4, ref('group_medcare_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- Prescription lines follow their prescription -->
+        <record id="rule_medcare_prescription_line_doctor" model="ir.rule">
+            <field name="name">Prescription line: doctor sees only his own</field>
+            <field name="model_id" ref="model_medcare_prescription_line"/>
+            <field name="groups" eval="[(4, ref('group_medcare_doctor'))]"/>
+            <field name="domain_force">[('prescription_id.doctor_id.user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_prescription_line_all" model="ir.rule">
+            <field name="name">Prescription line: admin sees all</field>
+            <field name="model_id" ref="model_medcare_prescription_line"/>
+            <field name="groups" eval="[(4, ref('group_medcare_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- ============ Patient (logged-in patient) -> only his own data ============ -->
+        <record id="rule_medcare_patient_self" model="ir.rule">
+            <field name="name">Patient: sees only his own record</field>
+            <field name="model_id" ref="model_medcare_patient"/>
+            <field name="groups" eval="[(4, ref('group_medcare_patient'))]"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_appointment_patient" model="ir.rule">
+            <field name="name">Appointment: patient sees only his own</field>
+            <field name="model_id" ref="model_medcare_appointment"/>
+            <field name="groups" eval="[(4, ref('group_medcare_patient'))]"/>
+            <field name="domain_force">[('patient_id.user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_prescription_patient" model="ir.rule">
+            <field name="name">Prescription: patient sees only his own</field>
+            <field name="model_id" ref="model_medcare_prescription"/>
+            <field name="groups" eval="[(4, ref('group_medcare_patient'))]"/>
+            <field name="domain_force">[('patient_id.user_id', '=', user.id)]</field>
+        </record>
+        <record id="rule_medcare_prescription_line_patient" model="ir.rule">
+            <field name="name">Prescription line: patient sees only his own</field>
+            <field name="model_id" ref="model_medcare_prescription_line"/>
+            <field name="groups" eval="[(4, ref('group_medcare_patient'))]"/>
+            <field name="domain_force">[('prescription_id.patient_id.user_id', '=', user.id)]</field>
+        </record>
+        <!-- a patient only sees the doctors who wrote his prescriptions -->
+        <record id="rule_medcare_doctor_patient" model="ir.rule">
+            <field name="name">Doctor: patient sees only his own doctors</field>
+            <field name="model_id" ref="model_medcare_doctor"/>
+            <field name="groups" eval="[(4, ref('group_medcare_patient'))]"/>
+            <field name="domain_force">['|', ('prescription_ids.patient_id.user_id', '=', user.id), ('appointment_ids.patient_id.user_id', '=', user.id)]</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,23 @@
+{
+    'name': 'MedCare',
+    'version': '17.0.1.4.0',
+    'category': 'Administration',
+    'author': 'Fatima Said',
+    'depends': ['base', 'mail', 'account'],
+    'data': [
+        'security/medcare_security.xml',
+        'security/ir.model.access.csv',
+        'data/medcare_data.xml',
+        'views/department_views.xml',
+        'views/patient_views.xml',
+        'views/doctor_views.xml',
+        'views/appointment_views.xml',
+        'views/appointment_report.xml',
+        'views/prescription_views.xml',
+        'views/prescription_report.xml',
+        'views/medcare_menus.xml',
+        'views/account_move_views.xml',
+    ],
+    'application': True,
+    'installable': True,
+}

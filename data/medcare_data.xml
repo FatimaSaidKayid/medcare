@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Prescription numbering: RX00001 ... -->
+        <record id="seq_medcare_prescription" model="ir.sequence">
+            <field name="name">MedCare Prescription</field>
+            <field name="code">medcare.prescription</field>
+            <field name="prefix">RX</field>
+            <field name="padding">5</field>
+        </record>
+
+        <!-- Default departments (same list the old Department selection had) -->
+        <record id="department_general_medicine" model="medcare.department"><field name="name">General Medicine</field></record>
+        <record id="department_pediatrics" model="medcare.department"><field name="name">Pediatrics</field></record>
+        <record id="department_cardiology" model="medcare.department"><field name="name">Cardiology</field></record>
+        <record id="department_dermatology" model="medcare.department"><field name="name">Dermatology</field></record>
+        <record id="department_gynecology" model="medcare.department"><field name="name">Gynecology</field></record>
+        <record id="department_orthopedics" model="medcare.department"><field name="name">Orthopedics</field></record>
+        <record id="department_ophthalmology" model="medcare.department"><field name="name">Ophthalmology</field></record>
+        <record id="department_urology" model="medcare.department"><field name="name">Urology</field></record>
+
+    </data>
+</odoo>

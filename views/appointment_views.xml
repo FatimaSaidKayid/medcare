@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_medcare_appointment_tree" model="ir.ui.view">
+        <field name="name">medcare.appointment.tree</field>
+        <field name="model">medcare.appointment</field>
+        <field name="arch" type="xml">
+            <tree string="Appointments" decoration-success="status=='confirmed'"
+                  decoration-info="status=='scheduled'"
+                  decoration-warning="status=='pending'"
+                  decoration-muted="status=='cancelled'">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="doctor_id"/>
+                <field name="appointment_date"/>
+                <field name="appointment_time" widget="float_time"/>
+                <field name="reason"/>
+                <field name="status" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_medcare_appointment_form" model="ir.ui.view">
+        <field name="name">medcare.appointment.form</field>
+        <field name="model">medcare.appointment</field>
+        <field name="arch" type="xml">
+            <form string="Appointment">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="status != 'scheduled'"/>
+                    <button name="action_start_consultation" type="object" string="Start Consultation"
+                            class="btn-primary" invisible="status != 'confirmed'"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="status != 'in_consultation'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="status in ('completed','cancelled')"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="scheduled,confirmed,in_consultation,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_prescription" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                groups="medcare.group_medcare_doctor" invisible="prescription_count == 0">
+                            <field name="prescription_count" widget="statinfo" string="Prescription"/>
+                        </button>
+                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-usd"
+                                invisible="not account_move_id">
+                            <field name="account_move_id" widget="statinfo" string="Invoice"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="patient_id"/>
+                            <field name="department_id"/>
+                            <field name="doctor_id" domain="[('department_id', '=?', department_id)]"/>
+                            <field name="appointment_date"/>
+                            <field name="appointment_time" widget="float_time"/>
+                            <field name="reason"/>
+                        </group>
+                        <group string="Additional Details">
+                            <field name="appointment_type"/>
+                            <field name="duration"/>
+                            <field name="location"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                    <group string="Attachments">
+                        <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <!-- The prescription is written right inside the appointment
+                             (one prescription per appointment). Doctor / admin only. -->
+                        <page string="Prescription" name="prescription" groups="medcare.group_medcare_doctor">
+                            <field name="prescription_count" invisible="1"/>
+                            <!-- no prescription yet: allow adding one -->
+                            <field name="prescription_ids" invisible="prescription_count &gt; 0"
+                                   context="{'default_patient_id': patient_id, 'default_doctor_id': doctor_id}">
+                                <tree create="true">
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="diagnosis"/>
+                                </tree>
+                                <form string="Prescription">
+                                        <group>
+                                            <field name="prescription_date"/>
+                                            <field name="diagnosis" placeholder="Diagnosis..."/>
+                                        </group>
+                                        <field name="line_ids">
+                                            <tree editable="bottom">
+                                                <field name="sequence" widget="handle"/>
+                                                <field name="medicine"/>
+                                                <field name="dosage"/>
+                                                <field name="frequency"/>
+                                                <field name="duration"/>
+                                                <field name="instructions"/>
+                                            </tree>
+                                        </field>
+                                        <group string="Notes / Advice">
+                                            <field name="notes" nolabel="1"/>
+                                        </group>
+                                    </form>
+                            </field>
+                            <!-- already has one: open / edit it, but no second one -->
+                            <field name="prescription_ids" invisible="prescription_count == 0"
+                                   context="{'default_patient_id': patient_id, 'default_doctor_id': doctor_id}">
+                                <tree create="false">
+                                    <field name="name"/>
+                                    <field name="prescription_date"/>
+                                    <field name="diagnosis"/>
+                                </tree>
+                                <form string="Prescription">
+                                        <group>
+                                            <field name="prescription_date"/>
+                                            <field name="diagnosis" placeholder="Diagnosis..."/>
+                                        </group>
+                                        <field name="line_ids">
+                                            <tree editable="bottom">
+                                                <field name="sequence" widget="handle"/>
+                                                <field name="medicine"/>
+                                                <field name="dosage"/>
+                                                <field name="frequency"/>
+                                                <field name="duration"/>
+                                                <field name="instructions"/>
+                                            </tree>
+                                        </field>
+                                        <group string="Notes / Advice">
+                                            <field name="notes" nolabel="1"/>
+                                        </group>
+                                    </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_medcare_appointment_calendar" model="ir.ui.view">
+        <field name="name">medcare.appointment.calendar</field>
+        <field name="model">medcare.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointments" date_start="start_datetime" date_stop="stop_datetime"
+                      color="doctor_id" mode="month">
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="status"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_medcare_appointment_search" model="ir.ui.view">
+        <field name="name">medcare.appointment.search</field>
+        <field name="model">medcare.appointment</field>
+        <field name="arch" type="xml">
+            <search string="Search Appointments">
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="reason"/>
+                <filter string="Today" name="today"
+                        domain="[('appointment_date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Scheduled" name="scheduled" domain="[('status','=','scheduled')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('status','=','confirmed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('status','=','cancelled')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_department" context="{'group_by':'department_id'}"/>
+                    <filter string="Doctor" name="group_doctor" context="{'group_by':'doctor_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by':'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by':'appointment_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_medcare_appointment" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="res_model">medcare.appointment</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="search_view_id" ref="view_medcare_appointment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Schedule a new appointment</p>
+        </field>
+    </record>
+
+</odoo>
